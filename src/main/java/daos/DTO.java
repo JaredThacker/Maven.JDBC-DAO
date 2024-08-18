@@ -5,7 +5,7 @@ import models.Car;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DTO {
+public class DTO{
 
     private Car extractUserFromResultSet(ResultSet rs) throws SQLException {
         Car car = new Car();
@@ -19,6 +19,4 @@ public class DTO {
 
         return car;
     }
-
-
 }
