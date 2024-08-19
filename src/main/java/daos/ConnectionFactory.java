@@ -1,3 +1,5 @@
+package daos;
+
 import com.mysql.cj.jdbc.Driver;
 
 import java.sql.Connection;
@@ -7,8 +9,8 @@ import java.sql.SQLException;
 public class ConnectionFactory {
 
     public static final String URL = "jdbc:mysql://localhost:3306/vehicles";
-    public static final String USER = "root";
-    public static final String PASS = "reincito";
+    public static final String USER = "j";
+    public static final String PASS = "fluffy";
 
     public static Connection getConnection(){
         try {

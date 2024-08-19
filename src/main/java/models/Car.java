@@ -1,12 +1,21 @@
 package models;
 
-public class Car {
-    private Long id;
-    private String model;
-    private String make;
-    private String color;
-    private Long vin;
-    private Integer year;
+import daos.DAO;
+import daos.DTO;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static daos.ConnectionFactory.getConnection;
+
+public class Car implements DAO<Car>{
+    private static Long id;
+    private static String model;
+    private static String make;
+    private static String color;
+    private static Long vin;
+    private static Integer year;
 
     public Car() {
     }
@@ -28,7 +37,7 @@ public class Car {
         this.year = year;
     }
 
-    public Long getId() {
+    public static Long getId() {
         return id;
     }
 
@@ -36,7 +45,7 @@ public class Car {
         this.id = id;
     }
 
-    public String getModel() {
+    public static String getModel() {
         return model;
     }
 
@@ -44,7 +53,7 @@ public class Car {
         this.model = model;
     }
 
-    public String getMake() {
+    public static String getMake() {
         return make;
     }
 
@@ -52,7 +61,7 @@ public class Car {
         this.make = make;
     }
 
-    public String getColor() {
+    public static String getColor() {
         return color;
     }
 
@@ -60,7 +69,7 @@ public class Car {
         this.color = color;
     }
 
-    public Long getVin() {
+    public static Long getVin() {
         return vin;
     }
 
@@ -68,11 +77,119 @@ public class Car {
         this.vin = vin;
     }
 
-    public Integer getYear() {
+    public static Integer getYear() {
         return year;
     }
 
     public void setYear(Integer year) {
         this.year = year;
+    }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "id=" + id +
+                ", model='" + model + '\'' +
+                ", make='" + make + '\'' +
+                ", color='" + color + '\'' +
+                ", vin=" + vin +
+                ", year=" + year +
+                '}';
+    }
+
+    @Override
+    public Car getByID(Long id) {
+        Connection connection = getConnection();
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM cars WHERE id=" + id);
+
+            if(rs.next())
+            {
+                return DTO.extractUserFromResultSet(rs);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public List getAll() {
+        List<Car> cars = new ArrayList<>();
+        String query = "SELECT * FROM cars";
+        try {
+            Connection connection = getConnection();
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            while(rs.next())
+            {
+                cars.add(new Car(rs.getLong("id"),rs.getString("model"),rs.getString("make"),rs.getString("color"),rs.getLong("vin"),rs.getInt("year")));
+            }
+        }
+
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return cars;
+    }
+
+    @Override
+    public boolean create(Car DTO) {
+        String query = "INSERT INTO cars (model,make,color,vin,year) VALUES (?,?,?,?,?)";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement pstm = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            pstm.setString(1, Car.getModel());
+            pstm.setString(2, Car.getMake());
+            pstm.setString(3, Car.getColor());
+            pstm.setLong(4, Car.getVin());
+            pstm.setInt(5, Car.getYear());
+            pstm.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean update(Car DTO) {
+
+        String query = "UPDATE cars SET model = ?,make = ?,color = ?,vin = ?,year = ? WHERE id = ?";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement pstm = connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
+            pstm.setString(1, DTO.getModel());
+            pstm.setString(2, DTO.getMake());
+            pstm.setString(3, DTO.getColor());
+            pstm.setLong(4, DTO.getVin());
+            pstm.setInt(5, DTO.getYear());
+            pstm.setLong(6, DTO.getId());
+            pstm.executeUpdate();
+
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        String query = "DELETE FROM cars WHERE id =?";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement pstm = connection.prepareStatement(query);
+            pstm.setLong(1,id);
+            pstm.executeUpdate();
+
+            return true;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

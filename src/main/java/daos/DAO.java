@@ -7,8 +7,7 @@ import java.util.List;
 public interface DAO<T> {
     T getByID(Long id);
     List<T> getAll();
-    T getCarByVIN(Long vin);
     boolean create(T DTO);
-    boolean update(Long id);
+    boolean update(T DTO);
     boolean delete(Long id);
 }
