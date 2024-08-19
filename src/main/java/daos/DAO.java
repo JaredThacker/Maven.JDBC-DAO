@@ -4,10 +4,10 @@ import models.Car;
 
 import java.util.List;
 
-public interface DAO {
-    Car getByID(Long id);
-    List<Car> getAll();
-    boolean create(Car DTO);
-    boolean update(Long id);
+public interface DAO<T> {
+    T getByID(Long id);
+    List<T> getAll();
+    boolean create(T DTO);
+    boolean update(T DTO);
     boolean delete(Long id);
 }

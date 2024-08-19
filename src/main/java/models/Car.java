@@ -9,13 +9,13 @@ import java.util.List;
 
 import static daos.ConnectionFactory.getConnection;
 
-public class Car implements DAO{
-    private Long id;
-    private String model;
-    private String make;
-    private String color;
-    private Long vin;
-    private Integer year;
+public class Car implements DAO<Car>{
+    private static Long id;
+    private static String model;
+    private static String make;
+    private static String color;
+    private static Long vin;
+    private static Integer year;
 
     public Car() {
     }
@@ -37,7 +37,7 @@ public class Car implements DAO{
         this.year = year;
     }
 
-    public Long getId() {
+    public static Long getId() {
         return id;
     }
 
@@ -45,7 +45,7 @@ public class Car implements DAO{
         this.id = id;
     }
 
-    public String getModel() {
+    public static String getModel() {
         return model;
     }
 
@@ -53,7 +53,7 @@ public class Car implements DAO{
         this.model = model;
     }
 
-    public String getMake() {
+    public static String getMake() {
         return make;
     }
 
@@ -61,7 +61,7 @@ public class Car implements DAO{
         this.make = make;
     }
 
-    public String getColor() {
+    public static String getColor() {
         return color;
     }
 
@@ -69,7 +69,7 @@ public class Car implements DAO{
         this.color = color;
     }
 
-    public Long getVin() {
+    public static Long getVin() {
         return vin;
     }
 
@@ -77,7 +77,7 @@ public class Car implements DAO{
         this.vin = vin;
     }
 
-    public Integer getYear() {
+    public static Integer getYear() {
         return year;
     }
 
@@ -139,14 +139,15 @@ public class Car implements DAO{
 
     @Override
     public boolean create(Car DTO) {
-        String query = "INSERT INTO cars (make,year,color,vin,model) VALUES (?,?,?,?,?)";
-        try {Connection connection = getConnection();
+        String query = "INSERT INTO cars (model,make,color,vin,year) VALUES (?,?,?,?,?)";
+        try {
+            Connection connection = getConnection();
             PreparedStatement pstm = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            pstm.setString(1, DTO.getMake());
-            pstm.setInt(2, DTO.getYear());
-            pstm.setString(3, DTO.getColor());
-            pstm.setString(4, DTO.getModel());
-            pstm.setLong(5, DTO.getVin());
+            pstm.setString(1, Car.getModel());
+            pstm.setString(2, Car.getMake());
+            pstm.setString(3, Car.getColor());
+            pstm.setLong(4, Car.getVin());
+            pstm.setInt(5, Car.getYear());
             pstm.executeUpdate();
 
         } catch (SQLException e) {
@@ -156,24 +157,24 @@ public class Car implements DAO{
     }
 
     @Override
-    public boolean update(Long id) {
-//        String query = "UPDATE car SET make = ?,year = ?,color = ?,vin = ?,model = ? WHERE id = ?";
-//        try {Connection connection = getConnection();
-//            PreparedStatement pstm = connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
-//            pstm.setString(1, .getMake());
-//            pstm.setInt(2,DTO.getYear());
-//            pstm.setString(3,DTO.getColor());
-//            pstm.setLong(4,DTO.getVin());
-//            pstm.setString(5,DTO.getModel());
-//            pstm.setLong(6,DTO.getId());
-//            pstm.executeUpdate();
-//
-//
-//            return DTO;
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-        return false;
+    public boolean update(Car DTO) {
+
+        String query = "UPDATE cars SET model = ?,make = ?,color = ?,vin = ?,year = ? WHERE id = ?";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement pstm = connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
+            pstm.setString(1, DTO.getModel());
+            pstm.setString(2, DTO.getMake());
+            pstm.setString(3, DTO.getColor());
+            pstm.setLong(4, DTO.getVin());
+            pstm.setInt(5, DTO.getYear());
+            pstm.setLong(6, DTO.getId());
+            pstm.executeUpdate();
+
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -185,9 +186,10 @@ public class Car implements DAO{
             pstm.setLong(1,id);
             pstm.executeUpdate();
 
+            return true;
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return false;
     }
 }
