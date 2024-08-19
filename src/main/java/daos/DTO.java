@@ -2,12 +2,13 @@ package daos;
 
 import models.Car;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+
+import static daos.ConnectionFactory.getConnection;
 
 public class DTO{
 
-    private Car extractUserFromResultSet(ResultSet rs) throws SQLException {
+    public static Car extractUserFromResultSet(ResultSet rs) throws SQLException {
         Car car = new Car();
 
         car.setId( rs.getLong("id") );
